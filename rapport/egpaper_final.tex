@@ -4,6 +4,7 @@
 \usepackage{times}
 \usepackage{epsfig}
 \usepackage{graphicx}
+\graphicspath{{../pdf/}{images}}
 \usepackage{amsmath}
 \usepackage{amssymb}\usepackage[utf8x]{inputenc}
 \usepackage[T1]{fontenc}
@@ -80,11 +81,49 @@ Voici les différentes problématiques connues liées aux EEG :
 \end{itemize}
 Pour ces raisons, l'application du deep learning sur les EEG donne des résultats de l'ordre de 50 pourcents pour le moment.
 
-\subsection{Le jeu de données}
-Le jeu de données que nous avons choisi est
+\section{BCI Competition IV}
+Le jeu de données que nous avons choisi est le dataset numéro 3 de la BCI Competition IV.
+
+Il contient les signaux de 10 capteurs MEG ayant un taux d'échantillonnage de 625 Hz.
+Le principe de chaque essai est le suivant : le sujet est assis sur une chaise à l'état de repos, dans une position la plus stable possible afin que les mouvements ne perturbent pas trop le signal. La tâche consiste à bouger un joystick avec la main droite pour atteindre une cible qui se trouve à gauche, à droite, en haut ou en bas de l'écran.
+
+Chaque prise de données se faisait sur le principe suivant :
+\begin{itemize}
+	\item Début de la prise de mesure
+	\item Après une à deux secondes, le signal est lancé
+	\item Le sujet a 0.75 secondes pour atteindre la cible et doit rester fixé dessus pendant 1 seconde au moins
+\end{itemize}
+
+Le test a été fait sur 2 sujets.
+Chaque sujet a effectué 40 mouvements dans chaque sens, ce qui donne 160 enregistrements labellisés par sujet.
 
 {\bf There will be no extra page charges for
   CVPR 2017.}
+
+
+\section{Human Connectome Project}
+Le jeu de données que nous avons utilisé est le WU-Minn HCP 1200 subjects qui a été crée sous l'égide du National Institutes of Health américain dont le but est de mettre à disposition un large dataset aux scientifiques du monde afin d'encourager les avancées de la recherche sur la carte des connectivités du cerveau.
+
+Le HCP 1200 subjects \cite{HCPmanual} contient des données d'imagerie médicale et comportementales pour 1200 patients.
+Il contient notamment des données MEG pour 95 patients.
+
+Chaque sujet MEG a effectué deux séances de tâches motrices inspirées du protocole mis en place par \cite{Buckner}, qui consistaient à bouger la main droite ou gauche ou le pied droit ou gauche.
+Pour chaque type de mouvement, le patient a effectué 8 blocs de 12 secondes pendant lequel il effectuait 10 mouvements. On a donc 
+\begin{center}
+	2 séances x 4 types de mouvements x 8 blocs x 10 mouvements = 640 enregistrements de mouvements par patients.
+\end{center}
+
+Cela nous fait un total de 95 x 640 = 60800 enregistrements de mouvements au total.
+
+
+Les données sont mises à disposition sur un serveur public AWS.
+
+\begin{figure*}
+\includegraphics[scale=0.5]{images/blocks_of_movements}
+	\caption{Exemple de séquence de mouvements dans un bloc.}
+\label{fig:long}
+\label{fig:onecol}
+\end{figure*}
 
 
 \begin{quote}

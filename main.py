@@ -29,7 +29,7 @@ model.compile(loss='binary_crossentropy',
               optimizer='rmsprop',
               metrics=['accuracy'])
 
-model.fit(x_train, y_train, batch_size=16, epochs=10)
+model.fit(x_train, y_train, batch_size=16, epochs=10, validation_data=)
 score, acc = model.evaluate(x_test, y_test, batch_size=16)
 print('Test score:', score)
 print('Test accuracy:', acc)
