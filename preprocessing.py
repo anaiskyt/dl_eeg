@@ -80,6 +80,40 @@ def get_data(s):
 
 
 
+tmeg_file = "project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_TEMG.mat"
+
+tfla_file = "project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_TFLA.mat"
+
+
+trial_info_file = "project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_trialinfo.mat"
+
+
+
+tmeg_data = loadmat(tmeg_file)
+np_array = tmeg_data["data"]
+
+#print(type(tmeg_data["data"]))
+
+
+mat = np_array[0][0][6][0][0][0][0][0][0][0][0][0][0][0][0]
+print(mat)
+
+print(mat.shape)
+print(type(mat))
+
+
+
+#print(np_array[0][0])
+
+
+
+#SIZE of array :  1 /  1 / 7
+# a priori toute pareil sauf premiere
+
+# Tailel 1 a l'intereir
+
+
+
 
 """electrode = range(data[0][0].shape[0])
 time = range(data[0][0].shape[1])

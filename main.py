@@ -3,7 +3,7 @@ from keras.layers import Dense, Dropout
 from keras.layers import Embedding
 from keras.layers import LSTM
 from keras.models import save_model
-from dl_eeg.preprocessing import get_data
+from preprocessing import get_data
 import numpy as np
 from scipy.io import loadmat
 

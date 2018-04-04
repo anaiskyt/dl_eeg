@@ -1,6 +1,7 @@
 
 import os.path as op
 from mne_hcp import hcp
+import mne
 from mne_hcp.hcp import preprocessing as preproc
 
 ##############################################################################
@@ -16,6 +17,7 @@ run_index = 0
 ##############################################################################
 # Let's get the evoked data.
 
+data = mne.io.read_raw_bti()
 
 info = hcp.read_raw(subject= subject, data_type= data_type, hcp_path= hcp_path)
 
