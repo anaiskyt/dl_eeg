@@ -79,8 +79,6 @@ def get_data(s):
     return train_test_split(data, labels, test_size=0.2, shuffle=True)
 
 
-
-
 """electrode = range(data[0][0].shape[0])
 time = range(data[0][0].shape[1])
 print(time)
