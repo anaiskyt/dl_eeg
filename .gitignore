@@ -36,5 +36,5 @@
 ehthumbs.db
 Thumbs.db
 
-project_data/*
+data/project_data/*
 mne-hcp/*
