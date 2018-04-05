@@ -3,70 +3,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.io.matlab import mio5_params
 from sklearn.model_selection import train_test_split
-
-
-def print_mat_nested(d, indent=0, nkeys=0):
-    """Pretty print nested structures from .mat files
-    Inspired by: `StackOverflow <http://stackoverflow.com/questions/3229419/pretty-printing-nested-dictionaries-in-python>`_
-    """
-
-    # Subset dictionary to limit keys to print.  Only works on first level
-    if nkeys > 0:
-        d = {k: d[k] for k in d.keys()}  # Dictionary comprehension: limit to first nkeys keys.
-
-    if isinstance(d, dict):
-        for key, value in d.items():  # iteritems loops through key, value pairs
-            print('\t' * indent + 'Key: ' + str(key))
-            print_mat_nested(value, indent + 1)
-
-    if isinstance(d, np.ndarray) and d.dtype.names is not None:  # Note: and short-circuits by default
-        for n in d.dtype.names:  # This means it's a struct, it's bit of a kludge test.
-            print('\t' * indent + 'Field: ' + str(n) + 'Value: ' + str(d[n]))
-            print_mat_nested(d[n], indent + 1)
-
-
-def dtype_shape_str(x):
-    """ Return string containing the dtype and shape of x."""
-    return str(x.dtype) + " " + str(x.shape)
-
-
-def new_loadmat(filename):
-    '''
-    this function should be called instead of direct spio.loadmat
-    as it cures the problem of not properly recovering python dictionaries
-    from mat files. It calls the function check keys to cure all entries
-    which are still mat-objects
-
-    from: `StackOverflow <http://stackoverflow.com/questions/7008608/scipy-io-loadmat-nested-structures-i-e-dictionaries>`_
-    '''
-    data = loadmat(filename, struct_as_record=False, squeeze_me=True)
-    return _check_keys(data)
-
-
-def _check_keys(dict):
-    '''
-    checks if entries in dictionary are mat-objects. If yes
-    todict is called to change them to nested dictionaries
-    '''
-    for key in dict:
-        if isinstance(dict[key], mio5_params.mat_struct):
-            dict[key] = _todict(dict[key])
-    return dict
-
-
-def _todict(matobj):
-    '''
-    A recursive function which constructs from matobjects nested dictionaries
-    '''
-    dict = {}
-    for strg in matobj._fieldnames:
-        elem = matobj.__dict__[strg]
-        if isinstance(elem, mio5_params.mat_struct):
-            dict[strg] = _todict(elem)
-        else:
-            dict[strg] = elem
-    return dict
-
+import matplotlib.pylab
+from dl_eeg.data_convertion import MatConverter
 
 
 def get_data(s):
@@ -79,11 +17,60 @@ def get_data(s):
     return train_test_split(data, labels, test_size=0.2, shuffle=True)
 
 
-"""electrode = range(data[0][0].shape[0])
-time = range(data[0][0].shape[1])
-print(time)
-for i in electrode:
-    plt.plot(time, data[0][0][i, :])
+def retrieve_and_count_elements(liste):
+    values = {}
+    for element in test[:, 1]:
+        if element not in values.keys():
+            values[element] = 0
+        else:
+            values[element] += 1
+    print(values)
 
-plt.show()"""
 
+class DataExtractor:
+
+    def __init__(self, path):
+        self.path = path
+        self.converter = MatConverter()
+        self.data = self.converter.load_data(self.path)
+
+    def time_series(self, trial=0):
+        '''Returns the time series associated to a specific trial'''
+        return self.data['data']['time'][trial]
+
+    def measures(self, channel=0, trial=0):
+        '''Return the measures associated to a specific trial and a specific channel (captor)'''
+        return self.data['data']['trial'][trial][channel]
+
+    def labels(self, trial=0):
+        '''Returns the label for a given trial'''
+        return self.data['data']['trialinfo'][trial, 1]
+
+    def plot_measures(self, time_series, measures):
+        '''Plots the measures'''
+        time_min, time_max = min(time_series), max(time_series)
+        meas_min, meas_max = min(measures), max(measures)
+        plt.figure(1, figsize=(50, 30))
+        plt.plot(time_series, measures)
+        plt.xlim([time_min, time_max])
+        plt.ylim([meas_min, meas_max])
+        plt.show()
+
+    def check_consistency(self, channel=95, trial=55):
+        time = self.time_series(trial)
+        measures = self.measures(channel, trial)
+        trial = self.labels(trial)
+        print('Data for the trial number ', trial, 'and the channel number ', channel)
+        print('Type of trial (1, 2, 4, 5 or 6) : ', trial)
+        print('Duration : ', time[-1]-time[0], 'seconds')
+        print('Measures : \n \t Amplitude : ', max(measures) - min(measures))
+        self.plot_measures(time, measures)
+
+
+if __name__ == '__main__':
+    extractor = DataExtractor('./data/project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_TFLA.mat')
+
+    #  Overview of the data for a given channel and trial
+    extractor.check_consistency(180, 360)
+
+    # Create matrix with all the data and labels
