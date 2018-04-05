@@ -34,3 +34,4 @@ score, acc = model.evaluate(x_test, y_test, batch_size=16)
 print('Test score:', score)
 print('Test accuracy:', acc)
 model.save('simplest_lstm.h5')
+

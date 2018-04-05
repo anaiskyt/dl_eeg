@@ -51,7 +51,7 @@ class DataExtractor:
         '''Plots the measures'''
         time_min, time_max = min(time_series), max(time_series)
         meas_min, meas_max = min(measures), max(measures)
-        plt.figure(1, figsize=(50, 30))
+        plt.figure(1, figsize=(10, 5))
         plt.plot(time_series, measures)
         plt.xlim([time_min, time_max])
         plt.ylim([meas_min, meas_max])
@@ -69,7 +69,7 @@ class DataExtractor:
 
 
 if __name__ == '__main__':
-    extractor = DataExtractor('./data/project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_TFLA.mat')
+    extractor = DataExtractor('data/project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_TFLA.mat')
 
     #  Overview of the data for a given channel and trial
     extractor.check_consistency(180, 360)
