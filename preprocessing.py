@@ -39,9 +39,12 @@ class DataExtractor:
         '''Returns the time series associated to a specific trial'''
         return self.data['data']['time'][trial]
 
-    def measures(self, channel=0, trial=0):
+    def measures(self, channel=0, trial=0, all_channels=False):
         '''Return the measures associated to a specific trial and a specific channel (captor)'''
-        return self.data['data']['trial'][trial][channel]
+        if all_channels:
+            return self.data['data']['trial'][trial]
+        else:
+            return self.data['data']['trial'][trial][channel]
 
     def labels(self, trial=0):
         '''Returns the label for a given trial'''
@@ -67,11 +70,39 @@ class DataExtractor:
         print('Measures : \n \t Amplitude : ', max(measures) - min(measures))
         self.plot_measures(time, measures)
 
+    def get_one_matrix(self, trial=0):
+        data = self.measures(trial=trial, all_channels=True)
+        channels, time = data.shape
+        data_reshaped = np.reshape(data, (1, time, channels))
+        return data_reshaped
+
+    def get_final_matrix(self):
+        number_sequences = self.data['data']['trial'].shape[0]
+        number_time_indexes = len(self.time_series())
+        number_channels = self.measures(trial=2, all_channels=True).shape[0]
+        matrix = np.zeros((number_sequences, number_time_indexes, number_channels))
+        for i in range(number_sequences):
+            sequence_matrix = self.get_one_matrix(i)
+            if sequence_matrix.shape != (1, number_time_indexes, number_channels):
+                print('Bad input removed : time ', sequence_matrix.shape[1], ' and channels ', sequence_matrix.shape[2])
+                matrix = np.delete(matrix, matrix.shape[0]-1, 0)
+            else:
+                matrix[i, :, :] = sequence_matrix
+                print('seq ', i, ' appended')
+        print(matrix)
+        print(matrix.shape)
+        return matrix
+
 
 if __name__ == '__main__':
     extractor = DataExtractor('data/project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_TFLA.mat')
 
     #  Overview of the data for a given channel and trial
-    extractor.check_consistency(180, 360)
+    #extractor.check_consistency(180, 360)
 
     # Create matrix with all the data and labels
+    #data = extractor.measures(trial=289, all_channels=False)
+
+    data = extractor.get_one_matrix(55)
+    data_reshaped = extractor.get_final_matrix()
+    np.savez('106521_data', data_reshaped)
