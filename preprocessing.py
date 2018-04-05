@@ -7,6 +7,7 @@ import matplotlib.pylab
 from dl_eeg.data_convertion import MatConverter
 
 
+#  TO DO : refactor this function for HCP data
 def get_data(s):
     data = np.zeros((160, 400, 10))
     labels = np.zeros((160, 4))
@@ -19,7 +20,7 @@ def get_data(s):
 
 def retrieve_and_count_elements(liste):
     values = {}
-    for element in test[:, 1]:
+    for element in liste[:, 1]:
         if element not in values.keys():
             values[element] = 0
         else:
