@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from scipy.io.matlab import mio5_params
 from sklearn.model_selection import train_test_split
 import matplotlib.pylab
-from dl_eeg.data_convertion import MatConverter
+from data_convertion import MatConverter
 
 
 #  TO DO : refactor this function for HCP data
