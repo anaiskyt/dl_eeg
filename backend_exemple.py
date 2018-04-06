@@ -25,7 +25,11 @@ X_train = sequence.pad_sequences(X_train, maxlen=max_review_length)
 X_test = sequence.pad_sequences(X_test, maxlen=max_review_length)
 
 
-save_list(X_train, "X_train2")
+print(type(X_train))
+print(X_train.shape)
+
+
+"""save_list(X_train, "X_train2")
 save_list(y_train, "y_train")
 
 
@@ -47,4 +51,4 @@ model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=3, batch_si
 
 # Final evaluation of the model
 scores = model.evaluate(X_test, y_test, verbose=0)
-print("Accuracy: %.2f%%" % (scores[1]*100))
+print("Accuracy: %.2f%%" % (scores[1]*100))"""

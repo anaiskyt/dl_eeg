@@ -38,3 +38,9 @@ Thumbs.db
 
 data/project_data/*
 mne-hcp/*
+
+
+Generated data
+*.pkl
+*.csv
+

@@ -1,51 +1,69 @@
-import numpy
+import numpy as np
 
 from keras.datasets import imdb
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, LSTM
 from keras.layers.embeddings import Embedding
 from keras.preprocessing import sequence
+from sklearn.model_selection import train_test_split
+from keras.utils import to_categorical
+
 
 from utils import save_list
 
+from utils import save_list, save2Dmat
 
-from preprocessing import
+from preprocessing import DataExtractor
 
-# fix random seed for reproducibility
-numpy.random.seed(7)
-
-
-# load the dataset but only keep the top n words, zero the rest
-top_words = 5000
-(X_train, y_train), (X_test, y_test) = imdb.load_data(num_words=top_words)
+import pickle
 
 
-save_list(X_train, "X_train")
+class Backend:
 
-# truncate and pad input sequences
-max_review_length = 500
-X_train = sequence.pad_sequences(X_train, maxlen=max_review_length)
-X_test = sequence.pad_sequences(X_test, maxlen=max_review_length)
+    def __init__(self):
 
-
-save_list(X_train, "X_train2")
-save_list(y_train, "y_train")
+        self.max_time_step = 1221
+        self.number_channels = 241
 
 
-# create the model
-embedding_vecor_length = 32
-model = Sequential()
-model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
-model.add(LSTM(100, dropout_W= 0.2, dropout_U=0.2))
-model.add(Dense(1, activation='sigmoid'))
-model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        # create the model
+        embedding_vecor_length = 32
+        self.model = Sequential()
+        self.model.add(LSTM(100, dropout_W=0.2, dropout_U=0.2, input_shape=(self.max_time_step, self.number_channels)))
+        self.model.add(Dense(6, activation='softmax'))
+        self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        print(self.model.summary())
+
+    def train(self, X_train, y_train, X_test, y_test):
+
+        self.model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=40, batch_size=24)
+
+    def evaluate(self, X_test, y_test):
+        scores = self.model.evaluate(X_test, y_test, verbose=0)
+        print("Accuracy: %.2f%%" % (scores[1] * 100))
 
 
-print(model.summary())
+if __name__ == "__main__":
+    # fix random seed for reproducibility
+    np.random.seed(7)
+    max_review_length = 500
+    with open("small_data.pkl", "rb") as f:
+        (X,y) = pickle.load(f)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+    y_train, y_test = to_categorical(y_train), to_categorical(y_test)
+
+    print(X_train.shape)
+    print(X_test.shape)
+    print(y_train.shape)
+    print(y_test.shape)
+    backend = Backend()
+
+    print("training")
+    backend.train(X_train, y_train, X_test, y_test)
+    print("evaluating")
+    backend.evaluate(X_test, y_test)
 
 
-model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=3, batch_size=64)
 
-# Final evaluation of the model
-scores = model.evaluate(X_test, y_test, verbose=0)
-print("Accuracy: %.2f%%" % (scores[1]*100))
+
