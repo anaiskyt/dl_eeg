@@ -46,9 +46,12 @@ class DataExtractor:
         else:
             return self.data['data']['trial'][trial][channel]
 
-    def labels(self, trial=0):
+    def labels(self, trial=0, all_trials=False):
         '''Returns the label for a given trial'''
-        return self.data['data']['trialinfo'][trial, 1]
+        if all_trials:
+            return self.data['data']['trialinfo'][:, 1]
+        else:
+            return self.data['data']['trialinfo'][trial, 1]
 
     def plot_measures(self, time_series, measures):
         '''Plots the measures'''
@@ -72,6 +75,7 @@ class DataExtractor:
 
     def get_one_matrix(self, trial=0):
         data = self.measures(trial=trial, all_channels=True)
+        #data = data[:data.shape[0]-4, :]
         channels, time = data.shape
         data_reshaped = np.reshape(data, (1, time, channels))
         return data_reshaped
@@ -80,15 +84,41 @@ class DataExtractor:
         number_sequences = self.data['data']['trial'].shape[0]
         number_time_indexes = len(self.time_series())
         number_channels = self.measures(trial=2, all_channels=True).shape[0]
-        matrix = np.zeros((number_sequences, number_time_indexes, number_channels))
+        matrix = np.zeros((number_sequences, number_time_indexes, number_channels-4))
         for i in range(number_sequences):
-            sequence_matrix = self.get_one_matrix(i)
-            if sequence_matrix.shape != (1, number_time_indexes, number_channels):
+            sequence_matrix = self.get_one_matrix(i)[:, :, :number_channels-4]
+            if sequence_matrix.shape != (1, number_time_indexes, number_channels-4):
                 print('Bad input removed : time ', sequence_matrix.shape[1], ' and channels ', sequence_matrix.shape[2])
                 matrix = np.delete(matrix, matrix.shape[0]-1, 0)
             else:
                 matrix[i, :, :] = sequence_matrix
                 print('seq ', i, ' appended')
+        print(matrix)
+        print(matrix.shape)
+        return matrix
+
+    def get_label(self):
+        number_sequences = self.data['data']['trial'].shape[0]
+        number_time_indexes = len(self.time_series())
+        number_channels = self.measures(trial=2, all_channels=True).shape[0]
+        labels = self.labels(all_trials=False)
+        matrix = np.zeros((number_sequences, 5))
+        for i in range(number_sequences):
+            if self.get_one_matrix(i).shape != (1, number_time_indexes, number_channels):
+                matrix = np.delete(matrix, matrix.shape[0]-1, 0)
+            else:
+                if labels[i] == 1.0:
+                    matrix[i, :] = [1, 0, 0, 0, 0]
+                elif labels[i] == 2.0:
+                    matrix[i, :] = [0, 1, 0, 0, 0]
+                elif labels[i] == 4.0:
+                    matrix[i, :] = [0, 0, 1, 0, 0]
+                elif labels[i] == 5.0:
+                    matrix[i, :] = [0, 0, 0, 1, 0]
+                elif labels[i] == 6.0:
+                    matrix[i, :] = [0, 0, 0, 0, 1]
+                else:
+                    print('Bad label input')
         print(matrix)
         print(matrix.shape)
         return matrix
@@ -101,8 +131,9 @@ if __name__ == '__main__':
     #extractor.check_consistency(180, 360)
 
     # Create matrix with all the data and labels
-    #data = extractor.measures(trial=289, all_channels=False)
+    #data = extractor.get_one_matrix(trial=89)
+    #print(data)
 
-    data = extractor.get_one_matrix(55)
+    #data = extractor.get_one_matrix(55)
     data_reshaped = extractor.get_final_matrix()
     np.savez('106521_data', data_reshaped)
