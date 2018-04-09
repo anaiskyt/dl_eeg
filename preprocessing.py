@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from scipy.io.matlab import mio5_params
 from sklearn.model_selection import train_test_split
 import matplotlib.pylab
-from dl_eeg.data_convertion import MatConverter
+from data_convertion import MatConverter
 
 
 #  TO DO : refactor this function for HCP data
@@ -35,19 +35,22 @@ class DataExtractor:
         self.converter = MatConverter()
         self.data = self.converter.load_data(self.path)
 
-    def time_series(self, trial=0):
-        '''Returns the time series associated to a specific trial'''
-        return self.data['data']['time'][trial]
+    def time_series(self, trial=0, all_trials=False):
+        '''Returns the time series associated to one or all the trials'''
+        if all_trials:
+            return self.data['data']['time']
+        else:
+            return self.data['data']['time'][trial]
 
     def measures(self, channel=0, trial=0, all_channels=False):
-        '''Return the measures associated to a specific trial and a specific channel (captor)'''
+        '''Return the measures associated to a specific trial and one or all the channels (captor)'''
         if all_channels:
             return self.data['data']['trial'][trial]
         else:
             return self.data['data']['trial'][trial][channel]
 
     def labels(self, trial=0, all_trials=False):
-        '''Returns the label for a given trial'''
+        '''Returns the label for one or all the trials'''
         if all_trials:
             return self.data['data']['trialinfo'][:, 1]
         else:
@@ -75,19 +78,20 @@ class DataExtractor:
 
     def get_one_matrix(self, trial=0):
         data = self.measures(trial=trial, all_channels=True)
-        #data = data[:data.shape[0]-4, :]
         channels, time = data.shape
-        data_reshaped = np.reshape(data, (1, time, channels))
-        return data_reshaped
+        matrix = np.zeros((1, time, channels))
+        for i in range(channels):
+            matrix[0, :, i] = data[i, :]
+        return matrix
 
     def get_final_matrix(self):
         number_sequences = self.data['data']['trial'].shape[0]
         number_time_indexes = len(self.time_series())
         number_channels = self.measures(trial=2, all_channels=True).shape[0]
-        matrix = np.zeros((number_sequences, number_time_indexes, number_channels-4))
+        matrix = np.zeros((number_sequences, number_time_indexes, number_channels))
         for i in range(number_sequences):
-            sequence_matrix = self.get_one_matrix(i)[:, :, :number_channels-4]
-            if sequence_matrix.shape != (1, number_time_indexes, number_channels-4):
+            sequence_matrix = self.get_one_matrix(i)[:, :, :number_channels]
+            if sequence_matrix.shape != (1, number_time_indexes, number_channels):
                 print('Bad input removed : time ', sequence_matrix.shape[1], ' and channels ', sequence_matrix.shape[2])
                 matrix = np.delete(matrix, matrix.shape[0]-1, 0)
             else:
@@ -101,7 +105,7 @@ class DataExtractor:
         number_sequences = self.data['data']['trial'].shape[0]
         number_time_indexes = len(self.time_series())
         number_channels = self.measures(trial=2, all_channels=True).shape[0]
-        labels = self.labels(all_trials=False)
+        labels = self.labels(all_trials=True)
         matrix = np.zeros((number_sequences, 5))
         for i in range(number_sequences):
             if self.get_one_matrix(i).shape != (1, number_time_indexes, number_channels):
@@ -124,16 +128,43 @@ class DataExtractor:
         return matrix
 
 
+class Augmentor:
+
+    def subsample_data(self, labels_matrix,  sampling=600, stride=100, padding=0):
+        number_samples_from_one_trial = 5
+        #number_samples_from_one_trial = int((data_matrix.shape[1] - sampling + 2*padding)/stride)
+        #new_matrix = np.zeros((number_samples_from_one_trial*data_matrix.shape[0], sampling, data_matrix.shape[2]))
+        new_labels = np.zeros((number_samples_from_one_trial * labels_matrix.shape[0], labels_matrix.shape[1]))
+
+        for i in range(labels_matrix.shape[0]):
+            print('new trial')
+            #trial = data_matrix[i, :, :]
+            label = labels_matrix[i, :]
+            #index = 0
+            for j in range(number_samples_from_one_trial):
+                #new_matrix[i*number_samples_from_one_trial+j, :, :] = trial[index:index+sampling, :]
+                new_labels[i*number_samples_from_one_trial+j, :] = label
+                #index += stride
+
+        #print(new_matrix)
+        print(new_labels)
+        return new_labels
+
+
 if __name__ == '__main__':
-    extractor = DataExtractor('./data/project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_TFLA.mat')
+    #extractor = DataExtractor('./data/project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_TFLA.mat')
+    augmentor = Augmentor()
 
     #  Overview of the data for a given channel and trial
     #extractor.check_consistency(180, 360)
 
-    # Create matrix with all the data and labels
-    #data = extractor.get_one_matrix(trial=89)
-    #print(data)
+    """labels = np.load('106521_labels.npz')
+    labels = labels['arr_0']
+    #labels = labels['arr_0']
+    #print(labels.shape)
+    new_lab = augmentor.subsample_data(labels)
+    np.savez('106521_labels_augmented.npz', new_lab)"""
 
-    #data = extractor.get_one_matrix(55)
-    data_reshaped = extractor.get_final_matrix()
-    np.savez('106521_data', data_reshaped)
+    labels = np.load('106521_labels_augmented.npz')
+    labels = labels['arr_0']
+    print(labels.shape)
