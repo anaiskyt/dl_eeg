@@ -53,8 +53,7 @@ if __name__ == '__main__':
     converter = MatConverter()
 
     #  load the .mat data and turn it into nested dictionnaries
-    data = converter.load_data(
-        './data/project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_TFLA.mat')
+    data = converter.load_data('data/project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_TFLA.mat')
 
     #  display the labels of the data available in the dataset
     analyse_nested_data(data)
