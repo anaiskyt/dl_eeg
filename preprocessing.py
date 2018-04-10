@@ -152,12 +152,8 @@ class Augmentor:
 
 
 if __name__ == '__main__':
-<<<<<<< HEAD
     #extractor = DataExtractor('./data/project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_TFLA.mat')
     augmentor = Augmentor()
-=======
-    extractor = DataExtractor('data/project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_TFLA.mat')
->>>>>>> 7fcd26568022634b945ad4667551e96efe10b6aa
 
     #  Overview of the data for a given channel and trial
     #extractor.check_consistency(180, 360)

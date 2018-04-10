@@ -1,29 +1,13 @@
-\begin{thebibliography}{1}\itemsep=-1pt
+\begin{thebibliography}{1}
 
-\bibitem{Alpher02}
-A.~Alpher.
-\newblock Frobnication.
-\newblock {\em Journal of Foo}, 12(1):234--778, 2002.
+\bibitem{HCPmanual}
+{\em WU-Minn HCP 1200 Subjects Data Release Reference Manual}, 2017.
 
-\bibitem{Alpher03}
-A.~Alpher and J.~P.~N. Fotheringham-Smythe.
-\newblock Frobnication revisited.
-\newblock {\em Journal of Foo}, 13(1):234--778, 2003.
-
-\bibitem{Alpher04}
-A.~Alpher, J.~P.~N. Fotheringham-Smythe, and G.~Gamow.
-\newblock Can a machine frobnicate?
-\newblock {\em Journal of Foo}, 14(1):234--778, 2004.
-
-\bibitem{Authors14}
-Authors.
-\newblock The frobnicatable foo filter, 2014.
-\newblock Face and Gesture submission ID 324. Supplied as additional material
-  {\tt fg324.pdf}.
-
-\bibitem{Authors14b}
-Authors.
-\newblock Frobnication tutorial, 2014.
-\newblock Supplied as additional material {\tt tr.pdf}.
+\bibitem{Buckner}
+Angela Castellanos Julio C.~Diaz Randy L.~Buckner, Fenna M.~Krienen and
+  B.~T.~Thomas Yeo.
+\newblock The organization of the human cerebellum estimated by intrinsic
+  functional connectivity.
+\newblock {\em Journal of Neurophysiology}, 2012.
 
 \end{thebibliography}
