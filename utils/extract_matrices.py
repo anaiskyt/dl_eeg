@@ -81,28 +81,25 @@ class DataExtractor:
 
     def get_final_matrix(self):
         matrix = np.zeros((self.number_trials, self.number_time_indexes, self.number_channels))
-        for i in range(self.number_trials):
-            sequence_matrix = self.measures(trial=i, all_channels=True, all_trials=False, zero_padding=True)
-            blank = np.zeros((1, sequence_matrix.shape[1], sequence_matrix.shape[0]))
-            for row in range(sequence_matrix.shape[0]):
-                blank[:, :, row] = sequence_matrix[row, :]
+        for i in range(self.number_channels):
+            channel_matrix = self.measures(channel=i, all_channels=False, all_trials=True, zero_padding=True)
+            scaler = StandardScaler()
+            scaler.fit(channel_matrix)
+            standardized = scaler.transform(channel_matrix)
+            print(standardized)
+            '''blank = np.zeros((channel_matrix.shape[0], channel_matrix.shape[1], 1))
+            for row in range(channel_matrix.shape[0]):
+                blank[row, :, 0] = standardized[row, :]
             print(blank)
-            print('blank shape :', blank.shape)
-            if sequence_matrix.shape != (1, self.number_time_indexes, self.number_channels):
-                print('Bad input removed : time ', sequence_matrix.shape[1], ' and channels ', sequence_matrix.shape[2])
+            print('blank shape :', blank.shape)'''
+            if standardized.shape != (self.number_trials, self.number_time_indexes):
+                print('Bad input removed : time ', standardized.shape[1], ' and channels ', standardized.shape[0])
                 matrix = np.delete(matrix, matrix.shape[0]-1, 0)
             else:
-                matrix[i, :, :] = sequence_matrix
+                matrix[:, :, i] = standardized
                 print('seq ', i, ' appended')
 
-        # Standardize on each channel
         matrix = matrix[:, :, matrix.shape[2]-4]
-        for j in range(self.number_channels):
-            channel = matrix[:, :, j]
-            scaler = StandardScaler()
-            scaler.fit(channel)
-            standardized = scaler.transform(channel)
-            matrix[:, :, j] = standardized
         print('final matrix : ', matrix)
         print('final matrix shape: ', matrix.shape)
         return matrix
@@ -170,7 +167,7 @@ class Augmentor:
 
 if __name__ == '__main__':
 
-    '''data = np.zeros((1, 1221, 241))
+    data = np.zeros((1, 1221, 241))
     labels = np.zeros((1, 5))
     dirs_path = '././data/project_data/HCP/'
     for dir in os.listdir(dirs_path):
@@ -189,8 +186,8 @@ if __name__ == '__main__':
     data = data[1:data.shape[0], :, :]
     labels = labels[1:, 5]
     np.savez('data_matrix.npz', data)
-    np.savez('labels.npz', labels)'''
+    np.savez('labels.npz', labels)
 
-    extractor = DataExtractor('././data/project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_TFLA.mat')
-    extractor.get_final_matrix()
+    extractor = DataExtractor('../data/project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_TFLA.mat')
+    #extractor.get_final_matrix()
     extractor.get_labels_matrix(same_seq_lengths=False)
