@@ -38,6 +38,10 @@ Thumbs.db
 
 data/project_data/*
 mne-hcp/*
+rapport/*
+results/*
+saved_nets/*
+logs/*
 
 
 Generated data
