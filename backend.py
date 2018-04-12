@@ -25,18 +25,18 @@ class Backend:
         self.max_time_step = 1221
         self.number_channels = 241
 
-
         # create the model
-        embedding_vecor_length = 32
         self.model = Sequential()
-        self.model.add(LSTM(100, dropout_W=0.2, dropout_U=0.2, input_shape=(self.max_time_step, self.number_channels)))
+        self.model.add(LSTM(64, dropout_W=0.2, dropout_U=0.2, return_sequences=True, input_shape=(self.max_time_step, self.number_channels)))
+        self.model.add(LSTM(64, dropout_W=0.2, dropout_U=0.2, return_sequences=True))  # returns a sequence of vectors of dimension 32
+        self.model.add(LSTM(64, dropout_W=0.2, dropout_U=0.2,))  # return a single vector of dimension 32
         self.model.add(Dense(6, activation='softmax'))
-        self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        self.model.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
         print(self.model.summary())
 
     def train(self, X_train, y_train, X_test, y_test):
 
-        self.model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=40, batch_size=24)
+        self.model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=50, batch_size=64)
 
     def evaluate(self, X_test, y_test):
         scores = self.model.evaluate(X_test, y_test, verbose=0)
