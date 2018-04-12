@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.io.matlab import mio5_params
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 import matplotlib.pylab
 from data_convertion import MatConverter
 
@@ -85,6 +86,7 @@ class DataExtractor:
         return matrix
 
     def get_final_matrix(self):
+        scaler = StandardScaler()
         number_sequences = self.data['data']['trial'].shape[0]
         number_time_indexes = len(self.time_series())
         number_channels = self.measures(trial=2, all_channels=True).shape[0]
@@ -97,8 +99,27 @@ class DataExtractor:
             else:
                 matrix[i, :, :] = sequence_matrix
                 print('seq ', i, ' appended')
+        for j in range(number_channels):
+            channel = matrix[:, :, j]
+            scaler = StandardScaler()
+            scaler.fit(channel)
+            standardized = scaler.transform(channel)
+            matrix[:, :, j] = standardized
         print(matrix)
         print(matrix.shape)
+        return matrix
+
+    def get_final_matrix_one_channel(self, channel):
+        number_sequences = self.data['data']['trial'].shape[0]
+        number_time_indexes = len(self.time_series())
+        number_channels = self.measures(trial=2, all_channels=True).shape[0]
+        matrix = np.zeros((number_sequences, number_time_indexes))
+        for i in range(number_sequences):
+            seq = self.measures(channel=channel, trial=i, all_channels=False)
+            if len(seq) != number_time_indexes:
+                matrix = np.delete(matrix, matrix.shape[0]-1, 0)
+            else:
+                matrix[i, :] = seq
         return matrix
 
     def get_label(self):
@@ -153,18 +174,5 @@ class Augmentor:
 
 if __name__ == '__main__':
     #extractor = DataExtractor('./data/project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_TFLA.mat')
-    augmentor = Augmentor()
-
-    #  Overview of the data for a given channel and trial
-    #extractor.check_consistency(180, 360)
-
-    """labels = np.load('106521_labels.npz')
-    labels = labels['arr_0']
-    #labels = labels['arr_0']
-    #print(labels.shape)
-    new_lab = augmentor.subsample_data(labels)
-    np.savez('106521_labels_augmented.npz', new_lab)"""
-
-    labels = np.load('106521_labels_augmented.npz')
-    labels = labels['arr_0']
-    print(labels.shape)
+    mat = np.load('channel_55_2d.npz')
+    print(mat['arr_0'].shape)
