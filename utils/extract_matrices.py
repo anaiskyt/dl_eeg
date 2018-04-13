@@ -18,7 +18,7 @@ class DataExtractor:
         self.data = self.converter.load_data(self.path)
         self.number_trials = self.data['data']['trial'].shape[0]
         self.number_time_indexes = len(self.time_series())
-        self.number_channels = self.measures(trial=2, all_channels=True).shape[0]
+        self.number_channels = len(self.data['data']['label'])
 
     def time_series(self, trial=0, all_trials=False):
         '''Returns the time series associated to one or all the trials'''
@@ -35,16 +35,20 @@ class DataExtractor:
 
         elif all_trials and not all_channels:
             # Returns nxm matrix with n = trials, m = time series
-            matrix = np.zeros((self.number_trials, self.number_time_indexes))
-            for i in range(self.number_trials):
-                if zero_padding:
-                    matrix[i, 0:len(self.data['data']['trial'][i][channel])] = self.data['data']['trial'][i][channel]
-                else:
-                    if len(self.data['data']['trial'][i][channel]) != self.number_time_indexes:
-                        matrix = np.delete(matrix, matrix.shape[0] - 1, 0)
+            if self.data['data']['trial'][i].shape[0] < channel:
+                print('Some channels were removed from the trial data')
+                return np.zeros((self.number_trials, self.number_time_indexes))
+            else:
+                matrix = np.zeros((self.number_trials, self.number_time_indexes))
+                for i in range(self.number_trials):
+                    if zero_padding:
+                        matrix[i, 0:len(self.data['data']['trial'][i][channel])] = self.data['data']['trial'][i][channel]
                     else:
-                        matrix[i, :] = self.data['data']['trial'][i][channel]
-            return matrix
+                        if len(self.data['data']['trial'][i][channel]) != self.number_time_indexes:
+                            matrix = np.delete(matrix, matrix.shape[0] - 1, 0)
+                        else:
+                            matrix[i, :] = self.data['data']['trial'][i][channel]
+                return matrix
 
         elif not all_trials and all_channels:
             return self.data['data']['trial'][trial]
@@ -80,8 +84,8 @@ class DataExtractor:
         self.plot_measures(time, measures)
 
     def get_final_matrix(self):
-        matrix = np.zeros((self.number_trials, self.number_time_indexes, self.number_channels))
-        for i in range(self.number_channels):
+        matrix = np.zeros((self.number_trials, self.number_time_indexes, self.number_channels-4))
+        for i in range(self.number_channels-4):
             channel_matrix = self.measures(channel=i, all_channels=False, all_trials=True, zero_padding=True)
             scaler = StandardScaler()
             scaler.fit(channel_matrix)
@@ -99,7 +103,6 @@ class DataExtractor:
                 matrix[:, :, i] = standardized
                 print('seq ', i, ' appended')
 
-        matrix = matrix[:, :, matrix.shape[2]-4]
         print('final matrix : ', matrix)
         print('final matrix shape: ', matrix.shape)
         return matrix
@@ -109,7 +112,7 @@ class DataExtractor:
         matrix = np.zeros((self.number_trials, 5))
         for i in range(self.number_trials):
             if same_seq_lengths:
-                if self.get_one_matrix(i).shape != (1, self.number_time_indexes, self.number_channels):
+                if self.measures(trial=i, all_channels=True, all_trials=False).shape != (1, self.number_time_indexes, self.number_channels):
                     matrix = np.delete(matrix, matrix.shape[0]-1, 0)
                 else:
                     if labels[i] == 1.0:
@@ -169,25 +172,19 @@ if __name__ == '__main__':
 
     data = np.zeros((1, 1221, 241))
     labels = np.zeros((1, 5))
-    dirs_path = '././data/project_data/HCP/'
+    dirs_path = '../data/project_data/HCP/'
     for dir in os.listdir(dirs_path):
-        data_path = '/MEG/Motort/tmegpreproc/'
-        try:
+        if not dir.startswith('.'):
+            data_path = '/MEG/Motort/tmegpreproc/'
             for file in os.listdir(dirs_path + str(dir) + data_path):
                 if file.endswith('TFLA.mat'):
-                    extractor = DataExtractor(dirs_path + str(dir) + data_path + '/' + file)
+                    extractor = DataExtractor(dirs_path + '/' + str(dir) + data_path + '/' + file)
                     mat = extractor.get_final_matrix()
                     data = np.concatenate((data, mat), axis=0)
                     lab = extractor.get_labels_matrix(same_seq_lengths=False)
                     labels = np.concatenate(labels, lab)
-        except:
-            pass
 
     data = data[1:data.shape[0], :, :]
-    labels = labels[1:, 5]
-    np.savez('data_matrix.npz', data)
-    np.savez('labels.npz', labels)
-
-    extractor = DataExtractor('../data/project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_TFLA.mat')
-    #extractor.get_final_matrix()
-    extractor.get_labels_matrix(same_seq_lengths=False)
+    labels = labels[1:, :]
+    np.savez('../data/data_matrix.npz', data)
+    np.savez('../data/labels.npz', labels)

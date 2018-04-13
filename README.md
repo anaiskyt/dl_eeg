@@ -29,3 +29,67 @@ len(processed_data['data']['trial'][0][0][0]) = 384
 6.0 94
 
 (289, 1221, 241)
+7
+
+ data
+	 label
+        Contient tous les noms de capteurs utilisés.
+        Taille 241
+	 trial
+	    Contient toutes les données des mesures.
+	    Liste des trials
+	    Dans chaque liste, matrice (nb de capteurs * indice temporel)
+	 time
+	    Chaque pas de temps auquel une mesure a été effectuée
+	 trialinfo
+	     Liste de taille le nombre de trials.
+	     Contient l'information de la séquence captée pour chaque trial.
+	 fsample
+	 cfg
+		 version
+			 name
+			 id
+		 trackcallinfo
+		 trackconfig
+		 checkconfig
+		 checksize
+		 showcallinfo
+		 debug
+		 trackdatainfo
+		 trackparaminfo
+		 previous
+	 grad
+		 balance
+			 Supine
+				 labelorg
+				 labelnew
+				 tra
+			 invcomp
+				 tra
+				 labelorg
+				 labelnew
+				 chantypeorg
+				 chantypenew
+				 chanunitorg
+				 chanunitnew
+			 pca
+				 tra
+				 labelorg
+				 labelnew
+				 chantypeorg
+				 chantypenew
+				 chanunitorg
+				 chanunitnew
+			 current
+			 previous
+		 chanori
+		 chanpos
+		 chantype
+		 chanunit
+		 coilori
+		 coilpos
+		 label
+		 labelorg
+		 tra
+		 type
+		 unit
