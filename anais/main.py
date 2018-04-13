@@ -17,15 +17,15 @@ import os
 batch_size = [16]
 epochs = [10]
 
-data = np.load('106521_stand.npz')
-labels = np.load('106521_labels.npz')
+data = np.load('../data/data_matrix.npz')
+labels = np.load('../data/labels.npz')
 data, labels = data['arr_0'], labels['arr_0']
 x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, shuffle=True)
 
 
 def create_model_lstm():
     model = Sequential()
-    model.add(LSTM(256, input_shape=(1221, 241)))
+    model.add(LSTM(256, input_shape=(1221, 242)))
     model.add(Dropout(0.5))
     model.add(Dense(5, activation='softmax'))
 

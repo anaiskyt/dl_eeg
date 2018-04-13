@@ -2,6 +2,7 @@ from keras.layers import Input, LSTM, RepeatVector
 from keras.models import Model
 import numpy as np
 from keras.callbacks import TensorBoard
+from keras.optimizers import SGD, RMSprop
 
 data = np.load('../data/data_matrix.npz')['arr_0']
 
@@ -18,6 +19,9 @@ decoded = LSTM(input_dim, return_sequences=True)(decoded)
 sequence_autoencoder = Model(inputs, decoded)
 encoder = Model(inputs, encoded)
 
-sequence_autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
-sequence_autoencoder.fit(data, data, epochs=50, batch_size=16, shuffle=True, validation_data=(data, data),
-                         callbacks=[TensorBoard(log_dir='/tb_logs', histogram_freq=0, write_graph=False)])
+sgd = SGD(lr=5, momentum=1.5, decay=1e-6, nesterov=False)
+rmsprop = RMSprop(lr=1, rho=0.9)
+
+sequence_autoencoder.compile(optimizer='rmsprop', loss='binary_crossentropy')
+sequence_autoencoder.fit(data, data, epochs=50, batch_size=128, shuffle=True, validation_data=(data, data),
+                         callbacks=[TensorBoard(log_dir='../logs', histogram_freq=0, write_graph=False)])
