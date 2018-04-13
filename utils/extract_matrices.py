@@ -18,7 +18,8 @@ class DataExtractor:
         self.data = self.converter.load_data(self.path)
         self.number_trials = self.data['data']['trial'].shape[0]
         self.number_time_indexes = len(self.time_series())
-        self.number_channels = len(self.data['data']['label'])
+        #self.number_channels = len(self.data['data']['label'])
+        self.number_channels = 246
 
     def time_series(self, trial=0, all_trials=False):
         '''Returns the time series associated to one or all the trials'''
@@ -37,9 +38,9 @@ class DataExtractor:
             # Returns nxm matrix with n = trials, m = time series
             matrix = np.zeros((self.number_trials, self.number_time_indexes))
             for i in range(self.number_trials):
-                if self.data['data']['trial'][i].shape[0] < channel:
+                if self.data['data']['trial'][i].shape[0] <= channel:
                     print('Some channels were removed from the trial data')
-                    return np.zeros((self.number_trials, self.number_time_indexes))
+                    pass
                 else:
                     if zero_padding:
                         matrix[i, 0:len(self.data['data']['trial'][i][channel])] = self.data['data']['trial'][i][channel]
@@ -48,7 +49,7 @@ class DataExtractor:
                             matrix = np.delete(matrix, matrix.shape[0] - 1, 0)
                         else:
                             matrix[i, :] = self.data['data']['trial'][i][channel]
-                return matrix
+            return matrix
 
         elif not all_trials and all_channels:
             return self.data['data']['trial'][trial]
@@ -170,7 +171,7 @@ class Augmentor:
 
 if __name__ == '__main__':
 
-    data = np.zeros((1, 1221, 241))
+    data = np.zeros((1, 1221, 242))
     labels = np.zeros((1, 5))
     dirs_path = '../data/project_data/HCP/'
     for dir in os.listdir(dirs_path):
@@ -182,7 +183,8 @@ if __name__ == '__main__':
                     mat = extractor.get_final_matrix()
                     data = np.concatenate((data, mat), axis=0)
                     lab = extractor.get_labels_matrix(same_seq_lengths=False)
-                    labels = np.concatenate(labels, lab)
+                    lab = lab.astype(int)
+                    labels = np.concatenate((labels, lab), axis=0)
 
     data = data[1:data.shape[0], :, :]
     labels = labels[1:, :]

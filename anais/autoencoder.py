@@ -4,10 +4,10 @@ from keras import backend as K
 import numpy as np
 
 
-data = np.load('dl_eel/data/matrices/106521_data.npz')['arr_0']
-data = np.reshape(data, (289, 1221, 241, 1))
+data = np.load('../data/data_matrix.npz')['arr_0']
+data = np.reshape(data, (792, 1221, 242, 1))
 
-input_img = Input(shape=(1221, 241, 1))  # adapt this if using `channels_first` image data format
+input_img = Input(shape=(1221, 242, 1))  # adapt this if using `channels_first` image data format
 
 encoded = Conv2D(32, (3, 3), activation='relu', padding='same')(input_img)
 encoder = Model(input_img, encoded)
@@ -22,4 +22,4 @@ autoencoder.fit(data, data,
                 shuffle=True,
                 validation_data=(data, data))
 
-encoder.save_weights('encoder.h5')
+encoder.save_weights('simplest_encoder.h5')
