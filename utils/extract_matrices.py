@@ -170,7 +170,7 @@ class Augmentor:
 
 if __name__ == '__main__':
 
-    data = np.zeros((1, 1221, 242))
+    '''data = np.zeros((1, 1221, 242))
     labels = np.zeros((1, 5))
     dirs_path = '../data/project_data/HCP/'
     for dir in os.listdir(dirs_path):
@@ -188,4 +188,13 @@ if __name__ == '__main__':
     data = data[1:data.shape[0], :, :]
     labels = labels[1:, :]
     np.savez('../data/data_matrix.npz', data)
-    np.savez('../data/labels.npz', labels)
+    np.savez('../data/labels.npz', labels)'''
+
+    data = np.load('../data/data_matrix.npz')
+    labels = np.load('../data/labels.npz')
+    data, labels = data['arr_0'], labels['arr_0']
+
+    augmentor = Augmentor()
+    data_augmented, labels_augmented = augmentor.subsample_data(data, labels)
+    np.savez('../data/data_matrix_augmented.npz', data)
+    np.savez('../data/labels_augmented.npz', labels)
