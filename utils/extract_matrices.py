@@ -148,25 +148,24 @@ class DataExtractor:
 
 class Augmentor:
 
-    def subsample_data(self, labels_matrix,  sampling=600, stride=100, padding=0):
-        number_samples_from_one_trial = 5
-        #number_samples_from_one_trial = int((data_matrix.shape[1] - sampling + 2*padding)/stride)
-        #new_matrix = np.zeros((number_samples_from_one_trial*data_matrix.shape[0], sampling, data_matrix.shape[2]))
+    def subsample_data(self, data_matrix, labels_matrix,  sampling=600, stride=100, padding=0):
+        number_samples_from_one_trial = int((data_matrix.shape[1] - sampling + 2*padding)/stride)
+        new_data_matrix = np.zeros((data_matrix.shape[0], sampling, number_samples_from_one_trial*data_matrix.shape[0]))
         new_labels = np.zeros((number_samples_from_one_trial * labels_matrix.shape[0], labels_matrix.shape[1]))
 
-        for i in range(labels_matrix.shape[0]):
-            print('new trial')
-            #trial = data_matrix[i, :, :]
-            label = labels_matrix[i, :]
-            #index = 0
-            for j in range(number_samples_from_one_trial):
-                #new_matrix[i*number_samples_from_one_trial+j, :, :] = trial[index:index+sampling, :]
-                new_labels[i*number_samples_from_one_trial+j, :] = label
-                #index += stride
+        for i in range(new_data_matrix.shape[0]):
+            trial = data_matrix[i, :, :]
+            for channel in range(new_data_matrix.shape[2]):
+                for j in range(number_samples_from_one_trial):
+                    new_data_matrix[i, :, channel*number_samples_from_one_trial + j] = trial[j*stride:j*stride+sampling, channel]
 
-        #print(new_matrix)
-        print(new_labels)
-        return new_labels
+        for i in range(labels_matrix.shape[0]):
+            label = labels_matrix[i, :]
+            for j in range(number_samples_from_one_trial):
+                new_labels[i*number_samples_from_one_trial+j, :] = label
+
+        print(new_data_matrix.shape, new_labels.shape)
+        return new_data_matrix, new_labels
 
 
 if __name__ == '__main__':
