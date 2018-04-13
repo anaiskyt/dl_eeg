@@ -35,12 +35,12 @@ class DataExtractor:
 
         elif all_trials and not all_channels:
             # Returns nxm matrix with n = trials, m = time series
-            if self.data['data']['trial'][i].shape[0] < channel:
-                print('Some channels were removed from the trial data')
-                return np.zeros((self.number_trials, self.number_time_indexes))
-            else:
-                matrix = np.zeros((self.number_trials, self.number_time_indexes))
-                for i in range(self.number_trials):
+            matrix = np.zeros((self.number_trials, self.number_time_indexes))
+            for i in range(self.number_trials):
+                if self.data['data']['trial'][i].shape[0] < channel:
+                    print('Some channels were removed from the trial data')
+                    return np.zeros((self.number_trials, self.number_time_indexes))
+                else:
                     if zero_padding:
                         matrix[i, 0:len(self.data['data']['trial'][i][channel])] = self.data['data']['trial'][i][channel]
                     else:
