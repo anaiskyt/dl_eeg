@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pylab
-from dl_venv.dl_eeg.utils.data_convertion import MatConverter
+from utils.data_convertion import MatConverter
 import os
 
 
