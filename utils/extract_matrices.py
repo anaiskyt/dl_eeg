@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pylab
-from data_convertion import MatConverter
+from dl_venv.dl_eeg.utils.data_convertion import MatConverter
 import os
 
 
@@ -20,6 +20,17 @@ class DataExtractor:
         self.number_time_indexes = len(self.time_series())
         #self.number_channels = len(self.data['data']['label'])
         self.number_channels = 246
+
+    def sampling_freq(self):
+        return self.data['data']['fsample']
+
+    def channel_names(self):
+        list_chan = [channel for channel in self.data['data']['label']]
+        return list_chan
+
+    def channel_position(self):
+        ''' Returns 271*3 matrix containing all the channels 3D coordinates'''
+        return self.data['data']['grad']['chanpos']
 
     def time_series(self, trial=0, all_trials=False):
         '''Returns the time series associated to one or all the trials'''
@@ -172,7 +183,7 @@ class Augmentor:
 
 if __name__ == '__main__':
 
-    '''data = np.zeros((1, 1221, 242))
+    data = np.zeros((1, 1221, 242))
     labels = np.zeros((1, 5))
     dirs_path = '../data/project_data/HCP/'
     for dir in os.listdir(dirs_path):
@@ -190,7 +201,7 @@ if __name__ == '__main__':
     data = data[1:data.shape[0], :, :]
     labels = labels[1:, :]
     np.savez('../data/data_matrix.npz', data)
-    np.savez('../data/labels.npz', labels)'''
+    np.savez('../data/labels.npz', labels)
 
     data = np.load('../data/data_matrix.npz')
     print('data loaded')

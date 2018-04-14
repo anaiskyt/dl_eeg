@@ -1,25 +1,57 @@
-from keras.layers import Input, Dense, Conv2D, MaxPooling2D, UpSampling2D
+from keras.layers import Input, LSTM, RepeatVector, Dense, Dropout
 from keras.models import Model, Sequential
-from keras import backend as K
 import numpy as np
+from keras.callbacks import TensorBoard, EarlyStopping
+import os
+from time import time
+from sklearn.model_selection import train_test_split
 
 
-data = np.load('../data/data_matrix.npz')['arr_0']
-data = np.reshape(data, (3245, 1221, 242, 1))
+data = np.load('../data/data_matrix.npz')
+labels = np.load('../data/labels.npz')
+data, labels = data['arr_0'], labels['arr_0']
+x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, shuffle=True)
 
-input_img = Input(shape=(1221, 242, 1))  # adapt this if using `channels_first` image data format
+latent_dim = 128
+timesteps = 1221
+input_dim = 242
 
-encoded = Conv2D(32, (3, 3), activation='relu', padding='same')(input_img)
-encoder = Model(input_img, encoded)
+inputs = Input(shape=(timesteps, input_dim))
 
-decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(encoded)
+encoder = Sequential()
+encoder.load_weights('./weights_encoder.h5', by_name=True)
+encoder.trainable = False
 
-autoencoder = Model(input_img, decoded)
-autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
-autoencoder.fit(data, data,
-                epochs=50,
-                batch_size=16,
-                shuffle=True,
-                validation_data=(data, data))
+encoded = Model(inputs, encoder)
 
-encoder.save_weights('simplest_encoder.h5')
+layer_1 = Dense(64, input_shape=(128, 128), activation='relu')(encoded)
+layer_1 = Dropout(0.5)(layer_1)
+layer_2 = Dense(64, activation='relu')(layer_1)
+layer_2 = Dropout(0.5)(layer_2)
+layer_3 = Dense(5, activation='softmax')(layer_2)
+
+complete_model = Model(encoded, layer_3)
+
+
+complete_model.compile(loss='categorical_crossentropy',
+              optimizer='rmsprop',
+              metrics=['accuracy'])
+
+
+batch_size = [128, 256]
+epochs = [10, 50, 100]
+
+for batch in batch_size:
+    for epoch in epochs:
+        directory = './logs/complete_b' + str(batch) + '_e_' + str(epoch)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        tensorboard = TensorBoard(log_dir=directory.format(time()), write_graph=True, write_images=True)
+
+        complete_model.fit(x_train, y_train,
+                           epochs=10,
+                           batch_size=128,
+                           callbacks=[tensorboard, EarlyStopping(patience=3, min_delta=0)])
+        score = complete_model.evaluate(x_test, y_test, batch_size=128)
+
+        complete_model.save('complete_model.h5')
