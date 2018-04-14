@@ -22,6 +22,8 @@ encoder = Model(inputs, encoded)
 sgd = SGD(lr=5, momentum=1.5, decay=1e-6, nesterov=False)
 rmsprop = RMSprop(lr=1, rho=0.9)
 
-sequence_autoencoder.compile(optimizer='rmsprop', loss='binary_crossentropy')
+sequence_autoencoder.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accuracy'])
 sequence_autoencoder.fit(data, data, epochs=10, batch_size=128, shuffle=True, validation_data=(data, data),
                          callbacks=[TensorBoard(log_dir='./logs/ae_128_batch_128_epoch_10', histogram_freq=0, write_graph=False)])
+encoder.save_weights('weights_encoder.h5')
+encoder.save('encoder.h5')
