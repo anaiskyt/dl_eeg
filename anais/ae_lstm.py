@@ -1,8 +1,9 @@
 from keras.layers import Input, LSTM, RepeatVector
 from keras.models import Model
 import numpy as np
-from keras.callbacks import TensorBoard
+from keras.callbacks import TensorBoard, EarlyStopping
 from keras.optimizers import SGD, RMSprop
+
 
 data = np.load('../data/data_matrix.npz')['arr_0']
 
@@ -24,4 +25,4 @@ rmsprop = RMSprop(lr=1, rho=0.9)
 
 sequence_autoencoder.compile(optimizer='rmsprop', loss='binary_crossentropy')
 sequence_autoencoder.fit(data, data, epochs=50, batch_size=256, shuffle=True, validation_data=(data, data),
-                         callbacks=[TensorBoard(log_dir='../logs', histogram_freq=0, write_graph=False)])
+                         callbacks=[TensorBoard(log_dir='../logs', histogram_freq=0, write_graph=False), EarlyStopping(patience=3, min_delta=0)])

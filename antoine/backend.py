@@ -9,25 +9,19 @@ from sklearn.model_selection import train_test_split
 from keras.utils import to_categorical
 
 
-from utils import save_list
+from utils.various import save_list, save2Dmat
 
-from utils import save_list, save2Dmat
-
-from preprocessing import DataExtractor
+from utils.extract_matrices import DataExtractor
 
 import pickle
 
 
-class Backend:
+class Lstm:
 
     def __init__(self):
 
         self.max_time_step = 1221
         self.number_channels = 241
-
-
-        # create the model
-        embedding_vecor_length = 32
         self.model = Sequential()
         self.model.add(LSTM(100, dropout_W=0.2, dropout_U=0.2, input_shape=(self.max_time_step, self.number_channels)))
         self.model.add(Dense(6, activation='softmax'))
@@ -57,7 +51,7 @@ if __name__ == "__main__":
     print(X_test.shape)
     print(y_train.shape)
     print(y_test.shape)
-    backend = Backend()
+    backend = Lstm()
 
     print("training")
     backend.train(X_train, y_train, X_test, y_test)

@@ -6,7 +6,7 @@ from keras.layers import Dense, Dropout, LSTM
 from keras.layers.embeddings import Embedding
 from keras.preprocessing import sequence
 
-from utils import save_list
+from utils.various import save_list
 
 # fix random seed for reproducibility
 numpy.random.seed(7)
