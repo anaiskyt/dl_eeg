@@ -66,7 +66,7 @@ def create_model_mlp():
 
 for batch in batch_size:
     for epoch in epochs:
-        directory = './logs/lstm_128_128_layer_' + str(batch) + '_epoch_' + str(epoch)
+        directory = './logs/lstm_128_128_128_layer_' + str(batch) + '_epoch_' + str(epoch)
         if not os.path.exists(directory):
             os.makedirs(directory)
         tensorboard = TensorBoard(log_dir=directory.format(time()), write_graph=True, write_images=True)
@@ -81,4 +81,4 @@ for batch in batch_size:
                   shuffle=True,
                   batch_size=batch, callbacks=[tensorboard])
         score = model.evaluate(x_test, y_test, batch_size=batch)
-        model.save('lstm_b' + str(batch) + '_e' + str(epoch) + '.h5')
+        #model.save('lstm_b' + str(batch) + '_e' + str(epoch) + '.h5')
