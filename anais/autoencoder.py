@@ -4,7 +4,7 @@ from keras import backend as K
 import numpy as np
 
 
-data = np.load('./data/matrices/106521_data.npz')['arr_0']
+data = np.load('dl_eel/data/matrices/106521_data.npz')['arr_0']
 data = np.reshape(data, (289, 1221, 241, 1))
 
 input_img = Input(shape=(1221, 241, 1))  # adapt this if using `channels_first` image data format
