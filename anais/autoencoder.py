@@ -5,7 +5,7 @@ import numpy as np
 
 
 data = np.load('../data/data_matrix.npz')['arr_0']
-data = np.reshape(data, (792, 1221, 242, 1))
+data = np.reshape(data, (3245, 1221, 242, 1))
 
 input_img = Input(shape=(1221, 242, 1))  # adapt this if using `channels_first` image data format
 
