@@ -19,7 +19,8 @@ input_dim = 242
 inputs = Input(shape=(timesteps, input_dim))
 
 encoder = Sequential()
-encoder.load_weights('./weights_encoder.h5', by_name=True)
+encoder.add(LSTM(latent_dim))
+encoder.load_weights('./weights_encoder.h5')
 encoder.trainable = False
 
 encoded = Model(inputs, encoder)
