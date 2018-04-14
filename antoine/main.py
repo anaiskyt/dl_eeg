@@ -6,22 +6,12 @@ from keras.optimizers import SGD
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-from keras.callbacks import TensorBoard
+from keras.callbacks import TensorBoard, EarlyStopping
 from keras.wrappers.scikit_learn import KerasClassifier
 from sklearn.model_selection import GridSearchCV
 from keras.layers import BatchNormalization
-from keras.callbacks import EarlyStopping
 import os
 
-
-# define the grid search parameters
-batch_size = [128, 256]
-epochs = [10, 50, 100]
-
-data = np.load('../data/data_matrix.npz')
-labels = np.load('../data/labels.npz')
-data, labels = data['arr_0'], labels['arr_0']
-x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, shuffle=True)
 
 
 def create_model_lstm():
@@ -65,22 +55,21 @@ def create_model_mlp():
     return model
 
 
-for batch in batch_size:
-    for epoch in epochs:
-        directory = './logs/lstm_128_128_128_layer_' + str(batch) + '_epoch_' + str(epoch)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        tensorboard = TensorBoard(log_dir=directory.format(time()), write_graph=True, write_images=True)
-        model = create_model_lstm()
-        #model.compile(loss='categorical_crossentropy',
-        #              optimizer='adam',
-        #              metrics=['accuracy'])
+print("loading data")
+data = np.load('../data/data_matrix.npz')
+labels = np.load('../data/labels.npz')
+print("dataloaded")
+data, labels = data['arr_0'], labels['arr_0']
+x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, shuffle=True)
+tensorboard = TensorBoard(log_dir="logs", write_graph=True, write_images=True)
+model = create_model_lstm()
 
-        model.fit(x_train, y_train,
-                  epochs=epoch,
-                  validation_split=0.2,
-                  shuffle=True,
-                  batch_size=batch, callbacks=[tensorboard,
-                                               EarlyStopping(patience=3, min_delta=0)])
-        score = model.evaluate(x_test, y_test, batch_size=batch)
-        #model.save('lstm_b' + str(batch) + '_e' + str(epoch) + '.h5')
+model.fit(x_train, y_train,
+          epochs=100,
+          validation_split=0.2,
+          shuffle=True,
+          batch_size=64, callbacks=[tensorboard,
+                                    EarlyStopping(patience=3, min_delta=0)])
+
+scores = model.evaluate(x_test, y_test, verbose=0)
+print("Accuracy: %.2f%%" % (scores[1] * 100))
