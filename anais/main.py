@@ -5,11 +5,7 @@ from keras.layers import LSTM, Conv1D, MaxPooling1D
 from keras.optimizers import SGD
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
 from keras.callbacks import TensorBoard
-from keras.wrappers.scikit_learn import KerasClassifier
-from sklearn.model_selection import GridSearchCV
-from keras.layers import BatchNormalization
 from keras.callbacks import EarlyStopping
 import os
 
@@ -18,6 +14,7 @@ import os
 batch_size = [128, 256]
 epochs = [50, 100]
 
+# load the data and split into train and test. Validation is retrieved automatically by Keras.
 data = np.load('../data/data_matrix.npz')
 labels = np.load('../data/labels.npz')
 data, labels = data['arr_0'], labels['arr_0']
@@ -67,19 +64,15 @@ def create_model_mlp():
 
 for batch in batch_size:
     for epoch in epochs:
-        directory = './logs/lstm_128_128_128_layer_' + str(batch) + '_epoch_' + str(epoch)
+        directory = './logs/lstm_layer_' + str(batch) + '_epoch_' + str(epoch)
         if not os.path.exists(directory):
             os.makedirs(directory)
         tensorboard = TensorBoard(log_dir=directory.format(time()), write_graph=True, write_images=True)
         model = create_model_lstm()
-        #model.compile(loss='categorical_crossentropy',
-        #              optimizer='adam',
-        #              metrics=['accuracy'])
 
         model.fit(x_train, y_train,
                   epochs=epoch,
-                  validation_data=(x_test, y_test),
+                  validation_split=0.2,
                   shuffle=True,
-                  batch_size=batch, callbacks=[tensorboard])
+                  batch_size=batch, callbacks=[tensorboard, EarlyStopping(patience=3, min_delta=0)])
         score = model.evaluate(x_test, y_test, batch_size=batch)
-        #model.save('lstm_b' + str(batch) + '_e' + str(epoch) + '.h5')
