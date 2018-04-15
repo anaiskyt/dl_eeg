@@ -16,7 +16,7 @@ import os
 
 # define the grid search parameters
 batch_size = [128, 256]
-epochs = [10, 50, 100]
+epochs = [50, 100]
 
 data = np.load('../data/data_matrix.npz')
 labels = np.load('../data/labels.npz')
@@ -78,9 +78,8 @@ for batch in batch_size:
 
         model.fit(x_train, y_train,
                   epochs=epoch,
-                  validation_split=0.2,
+                  validation_data=(x_test, y_test),
                   shuffle=True,
-                  batch_size=batch, callbacks=[tensorboard,
-                                               EarlyStopping(patience=3, min_delta=0)])
+                  batch_size=batch, callbacks=[tensorboard])
         score = model.evaluate(x_test, y_test, batch_size=batch)
         #model.save('lstm_b' + str(batch) + '_e' + str(epoch) + '.h5')

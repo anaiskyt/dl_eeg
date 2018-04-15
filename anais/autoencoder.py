@@ -37,8 +37,8 @@ complete_model.compile(loss='categorical_crossentropy',
               metrics=['accuracy'])
 
 
-batch_size = [12]
-epochs = [10, 50, 100]
+batch_size = [64, 128]
+epochs = [50, 100]
 
 for batch in batch_size:
     for epoch in epochs:
