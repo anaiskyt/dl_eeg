@@ -10,21 +10,21 @@ Utils :
 - data_augmentation : augmentation des données par sous-échantillonnage
 
 Structure globale de chaque fichier de données :
-- label
+- label : 
 Contient tous les noms de capteurs utilisés.
 Taille 241
-- trial
+- trial :
 Contient toutes les données des mesures.
 Liste des trials
 Dans chaque liste, matrice (nb de capteurs * indice temporel)
-- time
+- time : 
 Chaque pas de temps auquel une mesure a été effectuée
-- trialinfo
+- trialinfo : 
 Liste de taille le nombre de trials.
 Contient l'information de la séquence captée pour chaque trial.
-- fsample
+- fsample : 
 Fréquence d'échantillonnage
-- cfg
+- cfg : 
  version
  trackcallinfo
  trackconfig
@@ -35,7 +35,7 @@ Fréquence d'échantillonnage
  trackdatainfo
  trackparaminfo
  previous
-- grad
+- grad : 
 balance
 Supine
  labelorg
