@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pylab
-from utils.data_convertion import MatConverter
+from data_convertion import MatConverter
 import os
 
 
@@ -203,7 +203,7 @@ if __name__ == '__main__':
     np.savez('../data/data_matrix.npz', data)
     np.savez('../data/labels.npz', labels)
 
-    data = np.load('../data/data_matrix.npz')
+    '''data = np.load('../data/data_matrix.npz')
     print('data loaded')
     labels = np.load('../data/labels.npz')
     data, labels = data['arr_0'], labels['arr_0']
@@ -212,4 +212,4 @@ if __name__ == '__main__':
     augmentor = Augmentor()
     data_augmented, labels_augmented = augmentor.subsample_data(data, labels)
     np.savez('../data/data_matrix_augmented.npz', data_augmented)
-    np.savez('../data/labels_augmented.npz', labels_augmented)
+    np.savez('../data/labels_augmented.npz', labels_augmented)'''

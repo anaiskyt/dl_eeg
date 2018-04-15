@@ -7,8 +7,6 @@ import hcp
 
 trial = 2
 extractor = DataExtractor('/home/anais/dl_project/dl_venv/dl_eeg/data/project_data/HCP/106521/MEG/Motort/tmegpreproc/106521_MEG_10-Motort_tmegpreproc_TFLA.mat')
-
-
 sfreq = extractor.sampling_freq()  # Sampling frequency
 times = extractor.time_series(trial=trial, all_trials=False)
 ch_names = extractor.channel_names()
@@ -17,7 +15,7 @@ ch_types = ['grad' for i in range(len(ch_names))]
 print(len(ch_names))
 scalings = {key:1e-15 for key in ch_names}
 
-data = extractor.measures(trial=trial, all_trials=False, all_channels=True)
+data = np.load('recreated_signals.npz')['arr_0']
 '''reshaped = np.zeros((4, 241, 1221))
 reshaped = []
 for i in range(4):

@@ -1,10 +1,10 @@
 from keras.models import load_model
 import numpy as np
 
-#data = np.load('../data/data_matrix.npz')['arr_0'][55:58]
+data = np.load('../data/data_matrix.npz')['arr_0'][0:3000]
 #data = np.reshape(data, (3, 1221, 242))
 #labels = np.load('../data/labels.npz')['arr_0']
-#print('True label : ', labels[55:58])
+#print('True label : ', labels)
 
 model = load_model('encoder.h5')
 predictions = model.predict_on_batch(data)
@@ -116,3 +116,7 @@ data = np.array([ 8.07869956e-02 , 1.16699804e-02 ,-3.72680098e-01 ,-2.15319082e
 
 
 {0: [96, 90, 84, 80, 710], 1: [149, 137, 137, 167, 0], 2: [91, 133, 92, 98, 0], 3: [100, 104, 107, 111, 0], 4: [132, 108, 155, 119, 0]}
+=======
+np.savez('preditions_ae.npz', predictions) 
+#print('First prediction:', predictions)
+>>>>>>> 6d899708ce6703fdffd8f1bfc1022a19b1273c23

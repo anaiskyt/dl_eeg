@@ -62,8 +62,10 @@ len(processed_data['data']['trial'][0][0][0]) = 384
 		 balance
 			 Supine
 				 labelorg
+				    Liste des capteurs
 				 labelnew
 				 tra
+				    (271, 271)
 			 invcomp
 				 tra
 				 labelorg
