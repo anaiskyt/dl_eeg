@@ -1,3 +1,5 @@
+# Convert .mat data into dict
+
 from scipy.io import loadmat
 from scipy.io.matlab import mio5_params
 
